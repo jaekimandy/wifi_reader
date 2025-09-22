@@ -1,0 +1,101 @@
+# Gradle files
+.gradle/
+/build/
+gradle-app.setting
+
+# Gradle cache files (large binary files)
+.gradle/**/executionHistory/
+.gradle/**/fileHashes/
+.gradle/**/checksums/
+.gradle/**/*.bin
+.gradle/**/*.lock
+
+# App build files (but allow specific APK)
+app/build/
+!app/build/outputs/
+!app/build/outputs/apk/
+!app/build/outputs/apk/debug/
+!app/build/outputs/apk/debug/app-debug.apk
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Android Studio
+local.properties
+.DS_Store
+
+# Built application files
+*.ap_
+*.apk
+*-androidTest.apk
+*-release-unsigned.apk
+*-debug.aar
+*-release.aar
+
+# Generated files
+bin/
+gen/
+out/
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Signing files
+*.jks
+*.keystore
+
+# External native build
+.cxx/
+
+# Log files
+*.log
+bash.exe.stackdump
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Large model files in backup, scripts, and assets directories
+backup/*.tflite
+backup/*.traineddata
+backup/*.onnx
+backup/*.pth
+backup/*.caffemodel
+# Ignore all non-Python files in scripts directory
+scripts/*
+!scripts/*.py
+app/src/main/assets/*.tflite
+app/src/main/assets/*.traineddata
+app/src/main/assets/*.onnx
+app/src/main/assets/*.pth
+app/src/main/assets/*.caffemodel
+
+# Backup directory models (they're large)
+backup/models/
+
+# Test output
+test_output.log
+deps.txt
+
+# OpenCV SDK and build files
+opencv/
+opencv/**/build/

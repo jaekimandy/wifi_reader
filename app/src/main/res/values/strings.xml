@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WiFi Reader</string>
+    <string name="camera_permission_required">Camera permission is required to scan WiFi credentials</string>
+    <string name="scan_wifi_credentials">Scan WiFi Credentials</string>
+    <string name="ssid_label">SSID:</string>
+    <string name="password_label">Password:</string>
+    <string name="scanning">Scanning...</string>
+    <string name="no_credentials_found">No WiFi credentials detected</string>
+    <string name="copy_ssid">Copy SSID</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="copied_to_clipboard">Copied to clipboard</string>
+</resources>
