@@ -11,10 +11,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url = uri("https://jitpack.io") }
+        // Try adding potential Zetic repository
+        maven { url = uri("https://maven.pkg.github.com/zetic-ai/zetic-mlange") }
     }
 }
 
 rootProject.name = "WiFi Reader"
 include(":app")
-include(":opencv")
-project(":opencv").projectDir = file("opencv/OpenCV-android-sdk/sdk")
+// Removed OpenCV module - not being used

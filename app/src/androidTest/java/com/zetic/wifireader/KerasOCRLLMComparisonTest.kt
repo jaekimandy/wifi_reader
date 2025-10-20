@@ -98,7 +98,7 @@ class KerasOCRLLMComparisonTest {
         }
 
         // Assertions
-        assert("Should extract at least some text regions", textRegions.isNotEmpty())
+        assertTrue("Should extract at least some text regions", textRegions.isNotEmpty())
         assertNotNull("REGEX parsing should complete without errors", regexCredentials)
         assertNotNull("LLM parsing should complete without errors", llmCredentials)
     }

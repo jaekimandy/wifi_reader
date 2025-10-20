@@ -7,7 +7,7 @@ import com.zetic.wifireader.ml.ZeticMLangeDetector
 import com.zetic.wifireader.model.DetectionResult
 import com.zetic.wifireader.model.TextRegion
 import com.zetic.wifireader.model.WiFiCredentials
-import com.zetic.wifireader.ocr.PaddleOCREngine
+import com.zetic.wifireader.ocr.ZeticMLangeOCREngine
 import com.zetic.wifireader.ocr.OCREngine
 import com.zetic.wifireader.llm.ZeticMLangeLLMParser
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 class WiFiDetectionPipeline(private val context: Context) {
 
     private val zeticDetector = ZeticMLangeDetector(context)
-    private val ocrEngine: OCREngine = PaddleOCREngine(context)
+    private val ocrEngine: OCREngine = ZeticMLangeOCREngine(context)
     private val llmParser = ZeticMLangeLLMParser(context)
 
     companion object {
