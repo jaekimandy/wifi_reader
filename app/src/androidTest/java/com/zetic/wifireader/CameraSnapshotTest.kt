@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.zetic.wifireader.ocr.PaddleOCREngine
+import com.zetic.wifireader.ocr.ZeticMLangeOCREngine
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,12 +22,12 @@ class CameraSnapshotTest {
     fun testSavedCameraSnapshots() = runBlocking {
         println("=== SAVED CAMERA SNAPSHOT OCR TEST ===")
 
-        // Initialize PaddleOCR Engine
-        val ocrEngine = PaddleOCREngine(context)
+        // Initialize Zetic MLange OCR Engine
+        val ocrEngine = ZeticMLangeOCREngine(context)
         val initialized = ocrEngine.initialize()
 
-        assertTrue("PaddleOCR should initialize successfully", initialized)
-        println("✅ PaddleOCR initialized")
+        assertTrue("Zetic MLange OCR should initialize successfully", initialized)
+        println("✅ Zetic MLange OCR initialized")
 
         // Look for saved camera snapshots in multiple locations
         val externalFilesDir = context.getExternalFilesDir(null)
@@ -106,7 +106,7 @@ class CameraSnapshotTest {
         println("\n=== TEST COMPLETED ===")
     }
 
-    private suspend fun testSnapshotFile(ocrEngine: PaddleOCREngine, file: File, description: String) {
+    private suspend fun testSnapshotFile(ocrEngine: ZeticMLangeOCREngine, file: File, description: String) {
         try {
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
             if (bitmap == null) {
@@ -120,9 +120,9 @@ class CameraSnapshotTest {
             println("🔍 $description detected ${textRegions.size} text regions")
 
             if (textRegions.isEmpty()) {
-                println("✅ $description: NO TEXT DETECTED (expected in PaddleOCR mock mode)")
+                println("✅ $description: NO TEXT DETECTED")
             } else {
-                println("✅ $description: TEXT DETECTED (real models working)!")
+                println("✅ $description: TEXT DETECTED!")
                 textRegions.forEachIndexed { index, region ->
                     println("  Text $index: '${region.text}' (confidence: ${region.confidence})")
                 }
@@ -133,7 +133,7 @@ class CameraSnapshotTest {
         }
     }
 
-    private suspend fun testControlImage(ocrEngine: PaddleOCREngine) {
+    private suspend fun testControlImage(ocrEngine: ZeticMLangeOCREngine) {
         println("\n=== TESTING SYNTHETIC IMAGE (CONTROL) ===")
         val syntheticBitmap = createTestBitmap("HELLO CAMERA TEST")
         val syntheticTextRegions = ocrEngine.extractText(syntheticBitmap)
@@ -143,11 +143,10 @@ class CameraSnapshotTest {
             println("Synthetic text $index: '${region.text}' (confidence: ${region.confidence})")
         }
 
-        // In mock mode, we expect empty results but no crashes
         if (syntheticTextRegions.isEmpty()) {
-            println("✅ Synthetic image: PaddleOCR mock mode working correctly (empty results expected)")
+            println("✅ Synthetic image: No text detected")
         } else {
-            println("✅ Synthetic image: TEXT DETECTED (real models loaded)")
+            println("✅ Synthetic image: TEXT DETECTED!")
         }
     }
 

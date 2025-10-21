@@ -22,9 +22,9 @@ android {
         buildConfigField("String", "FACE_DEBUG_KEY", "\"dev_854ee24efea74a05852a50916e61518f\"")
         buildConfigField("String", "OLD_API_KEY", "\"dev_fc0e72ca87df47308bf88063c8f69f32\"")
 
-        // Model keys
-        buildConfigField("String", "TEXT_DETECT_MODEL", "\"PaddleOCR/ch_PP-OCRv4_det\"")
-        buildConfigField("String", "TEXT_RECOG_MODEL", "\"PaddleOCR/ch_PP-OCRv4_rec\"")
+        // Model keys - Using Zetic MLange for all models
+        buildConfigField("String", "TEXT_DETECT_MODEL", "\"jkim711/text_detect2\"")
+        buildConfigField("String", "TEXT_RECOG_MODEL", "\"jkim711/text_recog3\"")
         buildConfigField("String", "YOLO_MODEL", "\"Ultralytics/YOLOv8n\"")
         buildConfigField("String", "FACE_MODEL", "\"deepinsight/scrfd_500m\"")
     }
@@ -79,25 +79,8 @@ dependencies {
     // Permissions
     implementation("androidx.activity:activity-compose:1.8.2")
 
-    // Zetic MLange for on-device AI (upgraded to 1.3.0 - whisper app pattern)
+    // Zetic MLange for on-device AI - handles all model inference
     implementation("com.zeticai.mlange:mlange:1.3.0")
-
-    // ML/AI dependencies - TensorFlow Lite and Tesseract OCR (testing 2.16.1 before LiteRT migration)
-    implementation("org.tensorflow:tensorflow-lite:2.16.1")
-    implementation("org.tensorflow:tensorflow-lite-gpu:2.16.1")
-    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
-
-    // Tesseract OCR for Android
-    implementation("com.rmtheis:tess-two:9.1.0")
-
-    // TODO: Add TrOCR TFLite models to assets folder when ready:
-    // - trocr_text_detection.tflite (text detection)
-    // - trocr_text_recognition.tflite (text recognition)
-
-    // Note: Removed OpenCV dependency - not being used and caused native lib conflicts
-
-    // Note: Removed Google ML Kit - now using EasyOCR with TensorFlow Lite
-    // implementation("com.google.mlkit:text-recognition:16.0.0")
 
     // JSON parsing
     implementation("com.google.code.gson:gson:2.10.1")
