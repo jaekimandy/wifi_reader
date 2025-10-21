@@ -2,6 +2,8 @@
 
 A Kotlin Android application that detects WiFi SSID and password text from router labels using Zetic.MLange AI framework for complete end-to-end detection and recognition.
 
+> **⚠️ Current Status**: The app has model download issues (OCR: HTTP 401, LLM: invalid name format). YOLOv8n detection works. Tech support submission ready - see [docs/TECH_SUPPORT_SUMMARY.md](docs/TECH_SUPPORT_SUMMARY.md).
+
 ## Features
 
 - **Real-time Detection**: Uses camera to detect router labels in real-time
@@ -141,7 +143,6 @@ wifi_reader2/
 │   ├── llm/ZeticMLangeLLMParser.kt              # Credential parsing
 │   └── camera/CameraManager.kt                  # Camera handling
 ├── docs/
-│   ├── ADAPTATION_NOTES.md                      # YOLOv8 notes
 │   ├── PROJECT_STRUCTURE.md                     # Project organization
 │   ├── TECH_SUPPORT_SUMMARY.md                  # Tech support submission
 │   └── ZeticMLangeIntegration.md                # Zetic integration guide
