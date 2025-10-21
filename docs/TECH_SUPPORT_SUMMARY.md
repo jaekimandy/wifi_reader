@@ -9,12 +9,23 @@
 
 ## Issue Summary
 
-We are experiencing **HTTP 401 Unauthorized** errors when attempting to download Zetic MLange text detection and text recognition models. The YOLOv8n object detection model works correctly, but the OCR models fail to initialize due to authorization issues.
+We are experiencing multiple model download issues:
 
-**Update (Latest Test Run)**: The error has changed from HTTP 500 to HTTP 401, which indicates:
+### 1. OCR Models - HTTP 401 Unauthorized (PRIMARY ISSUE)
+Text detection and text recognition models fail to download with **HTTP 401 Unauthorized** errors. The YOLOv8n object detection model works correctly, but the OCR models fail to initialize due to authorization issues.
+
+**Analysis**: The error has changed from HTTP 500 to HTTP 401, which indicates:
 - ✅ The model names are correct and models exist on Zetic servers
 - ✅ Network connectivity and authentication work
 - ❌ The API keys lack authorization/permissions for these specific models
+
+### 2. LLM Model - Invalid Model Name Format (SECONDARY ISSUE)
+LLM model for WiFi credential parsing fails to download with error: **"Model name must include account name and project name and separated by slash(/)"**
+
+**Analysis**:
+- ❌ Model name `deepseek-r1-distill-qwen-1.5b-f16` doesn't follow required `account/project` format
+- ❓ Need correct model name in `account/project` format for LLM functionality
+- ❓ Alternative: Recommended LLM model for text parsing tasks
 
 ---
 
@@ -50,13 +61,14 @@ buildConfigField("String", "TEXT_DETECT_MODEL", "jkim711/text_detect2")
 buildConfigField("String", "TEXT_RECOG_MODEL", "jkim711/text_recog3")
 buildConfigField("String", "YOLO_MODEL", "Ultralytics/YOLOv8n")
 buildConfigField("String", "FACE_MODEL", "deepinsight/scrfd_500m")
+buildConfigField("String", "LLM_MODEL", "deepseek-r1-distill-qwen-1.5b-f16")  // Invalid format - needs account/project
 ```
 
 ---
 
 ## Error Details
 
-### HTTP 401 Unauthorized Error (Current Status)
+### Error 1: HTTP 401 Unauthorized (OCR Models)
 **Error Message**: `HTTP Failed. Code is 401, Detail: Unauthorized`
 
 **Previous Error**: HTTP 500 (Server Error) - now resolved, indicating models exist
@@ -65,14 +77,22 @@ buildConfigField("String", "FACE_MODEL", "deepinsight/scrfd_500m")
 1. `jkim711/text_detect2` - Text detection model (HTTP 401)
 2. `jkim711/text_recog3` - Text recognition model (HTTP 401)
 
-**Working Models**:
-- ✅ `Ultralytics/YOLOv8n` - Downloads and initializes successfully
-
 **Root Cause**: API keys need authorization/permissions to access these specific models
+
+### Error 2: Invalid Model Name Format (LLM Model)
+**Error Message**: `Model name must include account name and project name and separated by slash(/). (e.g. account/project)`
+
+**Affected Model**:
+- `deepseek-r1-distill-qwen-1.5b-f16` - LLM model for WiFi credential parsing
+
+**Root Cause**: Model name doesn't follow required `account/project` naming convention
+
+### Working Models
+- ✅ `Ultralytics/YOLOv8n` - Downloads and initializes successfully
 
 ### Model Initialization Code
 ```kotlin
-// Text Detection Model (FAILING)
+// Text Detection Model (FAILING - HTTP 401)
 model = ZeticMLangeModel(
     context,
     BuildConfig.DETECT_API_KEY,           // dev_9ba20e80c3fd4edf80f94906aa0ae27d
@@ -80,11 +100,19 @@ model = ZeticMLangeModel(
     null
 )
 
-// Text Recognition Model (FAILING)
+// Text Recognition Model (FAILING - HTTP 401)
 model = ZeticMLangeModel(
     context,
     BuildConfig.RECOG_API_KEY,            // dev_7c93c5d85a2a4ec399f86ac1c2ca1f17
     BuildConfig.TEXT_RECOG_MODEL,          // jkim711/text_recog3
+    null
+)
+
+// LLM Model (FAILING - Invalid Format)
+model = ZeticMLangeModel(
+    context,
+    BuildConfig.FACE_DEBUG_KEY,           // dev_854ee24efea74a05852a50916e61518f
+    "deepseek-r1-distill-qwen-1.5b-f16",  // Invalid - needs account/project format
     null
 )
 
@@ -117,8 +145,9 @@ model = ZeticMLangeModel(
 2. **Working Model Test (YOLOv8n)** - Control test with known working model
 3. **Text Detection Model Test** - Tests `jkim711/text_detect2` download
 4. **Text Recognition Model Test** - Tests `jkim711/text_recog3` download
-5. **Alternative API Key Test** - Tests if issue is API-key specific
-6. **Summary Report** - Provides diagnostic summary and recommendations
+5. **LLM Model Test** - Tests `deepseek-r1-distill-qwen-1.5b-f16` download (model name format issue)
+6. **Alternative API Key Test** - Tests if issue is API-key specific
+7. **Summary Report** - Provides diagnostic summary and recommendations
 
 **Output**: Clean, formatted diagnostic output with recommendations.
 
@@ -148,16 +177,18 @@ model = ZeticMLangeModel(
 
 ## Test Results (Full Test Suite)
 
-### Latest Test Run (After Cleanup)
-- **Total Tests**: 30
-- **Passed**: 18 (60%)
-- **Failed**: 12 (40%)
+### Latest Test Run (After LLM Test Addition)
+- **Total Tests**: 33
+- **Passed**: 19 (58%)
+- **Failed**: 14 (42%)
 - **Test Device**: SM-S938N - Android 15
-- **Key Change**: Error changed from HTTP 500 to HTTP 401
+- **Key Findings**:
+  - OCR models: HTTP 401 (authorization issue)
+  - LLM model: Invalid name format (needs account/project format)
 
 ### Failed Test Categories
 
-#### 1. Model Download Tests (2 failures - HTTP 401)
+#### 1. Model Download Tests (4 failures)
 ```
 ❌ test03_TextDetectionModelDownload
    Error: HTTP Failed. Code is 401, Detail: Unauthorized
@@ -166,6 +197,14 @@ model = ZeticMLangeModel(
 ❌ test04_TextRecognitionModelDownload
    Error: HTTP Failed. Code is 401, Detail: Unauthorized
    Analysis: API key needs authorization for jkim711/text_recog3
+
+❌ test05_LLMModelDownload (ZeticTechSupportTest)
+   Error: Model name must include account name and project name and separated by slash(/)
+   Analysis: Model name 'deepseek-r1-distill-qwen-1.5b-f16' doesn't follow account/project format
+
+❌ test01_LLMModelDownload (ZeticLLMDownloadTest)
+   Error: Model name must include account name and project name and separated by slash(/)
+   Analysis: Same as above - need correct LLM model name from Zetic
 ```
 
 #### 2. OCR Engine Tests (9 failures)
@@ -180,7 +219,6 @@ All OCR engine tests failed due to model initialization failure:
 ❌ testTextRecognitionCapability
 ❌ testMultipleImageSizes
 ❌ testDebugModelOutputs
-❌ testRealZeticTextDetectorInitialization
 ```
 
 #### 3. Camera Snapshot Test (1 failure)
@@ -202,24 +240,32 @@ All OCR engine tests failed due to model initialization failure:
 
 ## Questions for Tech Support
 
-### 1. Access Permissions (PRIMARY ISSUE)
+### 1. OCR Model Access Permissions (PRIMARY ISSUE)
 - **Q**: Can you grant access to `jkim711/text_detect2` for API key `dev_9ba20e80c3fd4edf80f94906aa0ae27d`?
 - **Q**: Can you grant access to `jkim711/text_recog3` for API key `dev_7c93c5d85a2a4ec399f86ac1c2ca1f17`?
 - **Q**: How do we request model access permissions on the Zetic MLange dashboard?
 - **Note**: We confirmed models exist (HTTP 401, not 404), we just need authorization
 
-### 2. Model Availability (CONFIRMED)
-- ✅ Model names are correct: `jkim711/text_detect2` and `jkim711/text_recog3`
+### 2. LLM Model Name Format (SECONDARY ISSUE)
+- **Q**: What is the correct `account/project` format for LLM model `deepseek-r1-distill-qwen-1.5b-f16`?
+- **Q**: Is this LLM model available on Zetic MLange? If so, what is the correct model name?
+- **Q**: Alternative: What LLM model would you recommend for text parsing tasks (WiFi credential extraction)?
+- **Error**: Current model name fails with "Model name must include account name and project name and separated by slash(/)"
+
+### 3. Model Availability (CONFIRMED)
+- ✅ OCR model names are correct: `jkim711/text_detect2` and `jkim711/text_recog3`
 - ✅ Models exist on Zetic servers (HTTP 401 proves this)
 - ❓ Are these public models or do they require explicit access grants?
+- ❌ LLM model name format is incorrect
 
-### 3. Model Format/Compatibility
+### 4. Model Format/Compatibility
 - **Q**: Are these models compatible with Zetic MLange SDK 1.3.0?
 - **Q**: Do they require a different initialization pattern than the YOLOv8 model?
 
-### 4. Alternative Solutions
+### 5. Alternative Solutions
 - **Q**: What text detection and recognition models would you recommend for our use case (WiFi credential extraction from router labels)?
 - **Q**: Are there pre-trained OCR models available on the Zetic MLange platform?
+- **Q**: Are there pre-trained LLM models available for text parsing/extraction tasks?
 
 ---
 
@@ -228,9 +274,9 @@ All OCR engine tests failed due to model initialization failure:
 ### Architecture
 Our app uses a 4-stage detection pipeline:
 1. **YOLOv8n** - Detects router label regions (✅ Working)
-2. **Text Detection** - Identifies text regions within labels (❌ Failing)
-3. **Text Recognition** - Extracts text from regions (❌ Failing)
-4. **LLM Parsing** - Parses SSID and password from text (✅ Working)
+2. **Text Detection** - Identifies text regions within labels (❌ Failing - HTTP 401)
+3. **Text Recognition** - Extracts text from regions (❌ Failing - HTTP 401)
+4. **LLM Parsing** - Parses SSID and password from text (❌ Failing - Invalid model name format)
 
 ### Code References
 - Text Detector: `app/src/main/java/com/zetic/wifireader/model/ZeticTextDetector.kt:46`
@@ -272,13 +318,14 @@ dependencies {
 ### Network Connectivity
 - ✅ Device has internet connection
 - ✅ Can successfully download YOLOv8n model
-- ❌ Cannot download text_detect2 and text_recog3 models
+- ❌ Cannot download text_detect2 and text_recog3 models (HTTP 401)
+- ❌ Cannot download LLM model (invalid name format)
 
 ---
 
 ## Expected Behavior
 
-We expect the text detection and recognition models to download and initialize successfully, similar to how the YOLOv8n model works:
+We expect all models to download and initialize successfully, similar to how the YOLOv8n model works:
 
 ```kotlin
 // This works ✅
@@ -296,13 +343,28 @@ val textDetector = ZeticMLangeModel(
     "jkim711/text_detect2",
     null
 )
+
+val textRecognizer = ZeticMLangeModel(
+    context,
+    "dev_7c93c5d85a2a4ec399f86ac1c2ca1f17",
+    "jkim711/text_recog3",
+    null
+)
+
+// This fails with invalid model name format ❌
+val llmModel = ZeticMLangeModel(
+    context,
+    "dev_854ee24efea74a05852a50916e61518f",
+    "deepseek-r1-distill-qwen-1.5b-f16",  // Needs account/project format
+    null
+)
 ```
 
 ---
 
 ## Request
 
-**Primary Request**: Grant API key access to models
+### Primary Request: Grant API Key Access to OCR Models
 
 Please grant the following API keys access to the corresponding models:
 
@@ -314,12 +376,24 @@ Please grant the following API keys access to the corresponding models:
    - **Model**: `jkim711/text_recog3`
    - **Current Status**: HTTP 401 Unauthorized
 
-**Alternative Request** (if above cannot be granted):
+### Secondary Request: Provide Correct LLM Model Name
+
+Please provide the correct model name in `account/project` format for:
+
+3. **LLM Model**: Currently using `deepseek-r1-distill-qwen-1.5b-f16`
+   - **API Key**: `dev_854ee24efea74a05852a50916e61518f` (or alternative)
+   - **Current Status**: Invalid model name format
+   - **Error**: "Model name must include account name and project name and separated by slash(/)"
+   - **Use Case**: WiFi credential text parsing
+   - **Alternative**: Recommend a suitable LLM model for text parsing tasks
+
+### Alternative Request (if above cannot be granted):
 
 Please provide:
 1. Alternative text detection and recognition model names that our API keys can access
-2. Instructions on how to request model access through the Zetic MLange dashboard
-3. Recommended OCR models for WiFi credential extraction use case
+2. Alternative LLM model name in correct `account/project` format for text parsing
+3. Instructions on how to request model access through the Zetic MLange dashboard
+4. Recommended OCR and LLM models for WiFi credential extraction use case
 
 ---
 
@@ -333,10 +407,16 @@ Please provide:
 
 ## Files to Share with Tech Support
 
-### 1. Diagnostic Test File
-**File**: `app/src/androidTest/java/com/zetic/wifireader/ZeticTechSupportTest.kt`
-- Comprehensive diagnostic test suite
+### 1. Diagnostic Test Files
+**Primary File**: `app/src/androidTest/java/com/zetic/wifireader/ZeticTechSupportTest.kt`
+- Comprehensive diagnostic test suite (7 tests)
+- Tests OCR models (HTTP 401 errors)
+- Tests LLM model (invalid name format error)
 - Run this test and share console output
+
+**LLM-Specific Test**: `app/src/androidTest/java/com/zetic/wifireader/ZeticLLMDownloadTest.kt`
+- Focused LLM model download test
+- Demonstrates the model name format issue
 
 ### 2. Test Reports
 - **Diagnostic Test Output**: Console output from running `ZeticTechSupportTest`
@@ -350,6 +430,7 @@ Please provide:
 - `app/src/main/java/com/zetic/wifireader/model/ZeticTextDetector.kt` (line 46 - model initialization)
 - `app/src/main/java/com/zetic/wifireader/model/ZeticTextRecognizer.kt` (line 34 - model initialization)
 - `app/src/main/java/com/zetic/wifireader/ocr/ZeticMLangeOCREngine.kt`
+- `app/src/main/java/com/zetic/wifireader/llm/ZeticMLangeLLMParser.kt` (LLM parser implementation)
 
 ---
 

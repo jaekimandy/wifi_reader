@@ -228,11 +228,62 @@ class ZeticTechSupportTest {
     }
 
     // ========================================================================
-    // TEST 5: Alternative API Key Test (FACE_DEBUG_KEY)
+    // TEST 5: LLM Model Download (deepseek-r1-distill-qwen-1.5b-f16)
     // ========================================================================
     @Test
-    fun test05_AlternativeAPIKey_TextDetection() {
-        println("TEST 5: Text Detection with Alternative API Key")
+    fun test05_LLMModelDownload() {
+        println("TEST 5: LLM Model Download")
+        println("-".repeat(80))
+        println("Model: $FACE_MODEL")
+        println("API Key: $FACE_DEBUG_KEY")
+        println("Purpose: Test LLM model for WiFi credential parsing")
+
+        try {
+            val startTime = System.currentTimeMillis()
+            val model = ZeticMLangeModel(context, FACE_DEBUG_KEY, "deepseek-r1-distill-qwen-1.5b-f16", null)
+            val downloadTime = System.currentTimeMillis() - startTime
+
+            println("  ✅ SUCCESS: LLM model downloaded successfully")
+            println("  Download Time: ${downloadTime}ms")
+            println("  Model Instance: $model")
+            assertTrue("LLM model should download successfully", true)
+
+        } catch (e: Exception) {
+            println("  ❌ FAILED: LLM model download failed")
+            println("  Error Type: ${e.javaClass.simpleName}")
+            println("  Error Message: ${e.message}")
+
+            // Detailed error analysis
+            when {
+                e.message?.contains("401") == true -> {
+                    println("  🔍 Analysis: HTTP 401 - Unauthorized")
+                    println("     - API key may not have access to this LLM model")
+                }
+                e.message?.contains("404") == true -> {
+                    println("  🔍 Analysis: HTTP 404 - Not Found")
+                    println("     - LLM model may not be available in Zetic MLange")
+                }
+                e.message?.contains("500") == true -> {
+                    println("  🔍 Analysis: HTTP 500 - Server Error")
+                    println("     - Model may not exist on Zetic platform")
+                }
+                else -> {
+                    println("  🔍 Analysis: Other error - ${e.message}")
+                }
+            }
+
+            e.printStackTrace()
+            fail("LLM model download failed: ${e.message}")
+        }
+        println()
+    }
+
+    // ========================================================================
+    // TEST 6: Alternative API Key Test (FACE_DEBUG_KEY)
+    // ========================================================================
+    @Test
+    fun test06_AlternativeAPIKey_TextDetection() {
+        println("TEST 6: Text Detection with Alternative API Key")
         println("-".repeat(80))
         println("Model: $TEXT_DETECT_MODEL")
         println("API Key: $FACE_DEBUG_KEY (the one that works for YOLOv8n)")
@@ -256,11 +307,11 @@ class ZeticTechSupportTest {
     }
 
     // ========================================================================
-    // TEST 6: Summary Report
+    // TEST 7: Summary Report
     // ========================================================================
     @Test
-    fun test06_SummaryReport() {
-        println("TEST 6: Diagnostic Summary")
+    fun test07_SummaryReport() {
+        println("TEST 7: Diagnostic Summary")
         println("=".repeat(80))
 
         val results = mutableMapOf<String, Boolean>()
@@ -290,6 +341,14 @@ class ZeticTechSupportTest {
             results["Text Recognition"] = true
         } catch (e: Exception) {
             results["Text Recognition"] = false
+        }
+
+        // LLM Model
+        try {
+            ZeticMLangeModel(context, FACE_DEBUG_KEY, "deepseek-r1-distill-qwen-1.5b-f16", null)
+            results["LLM (deepseek-r1)"] = true
+        } catch (e: Exception) {
+            results["LLM (deepseek-r1)"] = false
         }
 
         println("\nFINAL RESULTS:")
