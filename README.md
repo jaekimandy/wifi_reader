@@ -34,9 +34,12 @@ Camera Frame → YOLOv8 Detection → Text Detection → Text Recognition → LL
 
 ### Zetic MLange Models
 
-- **Object Detection**: `Ultralytics/YOLOv8n`
-- **Text Detection**: `jkim711/text_detect2`
-- **Text Recognition**: `jkim711/text_recog3`
+- **Object Detection**: `Ultralytics/YOLOv8n` (✅ Working)
+- **Text Detection**: `jkim711/text_detect2` (⚠️ Requires authorization)
+- **Text Recognition**: `jkim711/text_recog3` (⚠️ Requires authorization)
+- **LLM Parsing**: `deepseek-r1-distill-qwen-1.5b-f16` (⚠️ Invalid model name format)
+
+**Current Status**: The app is currently experiencing model download issues with OCR and LLM models. See [docs/TECH_SUPPORT_SUMMARY.md](docs/TECH_SUPPORT_SUMMARY.md) for details.
 
 ## Setup
 
@@ -75,6 +78,11 @@ All models are automatically downloaded and managed by Zetic MLange SDK:
 - Cloud-based model management
 
 The app uses pre-configured API keys for Zetic MLange services. Models are downloaded on first initialization.
+
+**⚠️ Known Issues**:
+- OCR models (`jkim711/text_detect2`, `jkim711/text_recog3`) require API key authorization (HTTP 401 error)
+- LLM model name format issue - needs correct `account/project` format
+- See [docs/TECH_SUPPORT_SUMMARY.md](docs/TECH_SUPPORT_SUMMARY.md) for full details and current status
 
 ## Usage
 
@@ -135,6 +143,7 @@ wifi_reader2/
 ├── docs/
 │   ├── ADAPTATION_NOTES.md                      # YOLOv8 notes
 │   ├── PROJECT_STRUCTURE.md                     # Project organization
+│   ├── TECH_SUPPORT_SUMMARY.md                  # Tech support submission
 │   └── ZeticMLangeIntegration.md                # Zetic integration guide
 └── README.md                                     # This file
 ```
@@ -165,11 +174,23 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 ### Testing
 
-The app includes instrumentation tests for the OCR engine and detection pipeline:
+The app includes comprehensive instrumentation tests for model downloads, OCR engine, and detection pipeline:
 
 ```bash
+# Run all tests
 ./gradlew connectedAndroidTest
+
+# Run tech support diagnostic test (recommended)
+./gradlew connectedAndroidTest --tests "com.zetic.wifireader.ZeticTechSupportTest"
 ```
+
+**Test Results** (Latest Run):
+- Total: 33 tests
+- Passed: 19 (58%)
+- Failed: 14 (42%)
+- Key Issues: OCR model authorization (HTTP 401), LLM model name format
+
+See [docs/TECH_SUPPORT_SUMMARY.md](docs/TECH_SUPPORT_SUMMARY.md) for detailed test results and diagnostics.
 
 ## Contributing
 
@@ -183,6 +204,29 @@ The app includes instrumentation tests for the OCR engine and detection pipeline
 
 This project is licensed under the MIT License.
 
+## Known Issues & Status
+
+### Model Download Issues (Pending Zetic Tech Support)
+
+⚠️ The app currently has model download issues affecting full functionality:
+
+1. **OCR Models (Primary Issue)**:
+   - Models `jkim711/text_detect2` and `jkim711/text_recog3` return HTTP 401 Unauthorized
+   - API keys need authorization to access these models
+   - Affects text detection and recognition stages of the pipeline
+
+2. **LLM Model (Secondary Issue)**:
+   - Model name `deepseek-r1-distill-qwen-1.5b-f16` doesn't follow required `account/project` format
+   - Need correct model name from Zetic support
+   - Affects WiFi credential parsing stage
+
+3. **Working Components**:
+   - ✅ YOLOv8n object detection (router label detection) works correctly
+   - ✅ Camera functionality and UI work correctly
+   - ✅ All infrastructure and Android components work correctly
+
+**Status**: Tech support submission prepared. See [docs/TECH_SUPPORT_SUMMARY.md](docs/TECH_SUPPORT_SUMMARY.md) for complete details.
+
 ## Notes
 
 - **Physical Device Required**: Camera functionality requires a physical Android device
@@ -190,3 +234,4 @@ This project is licensed under the MIT License.
 - **Performance**: Varies based on device capabilities and lighting conditions
 - **Best Results**: Ensure good lighting and hold camera steady for 2-3 seconds
 - **Privacy**: All processing happens on-device after initial model download
+- **Development Status**: Currently awaiting Zetic tech support resolution for model access
